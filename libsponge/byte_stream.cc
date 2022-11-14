@@ -55,7 +55,6 @@ void ByteStream::pop_output(const size_t len)
 std::string ByteStream::read(const size_t len)
 {
     size_t real_len = min(len, _buf.size());
-    printf("%ld\n", real_len);
     string out = peek_output(real_len);
     pop_output(real_len);
     return out;
