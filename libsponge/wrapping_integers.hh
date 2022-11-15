@@ -15,6 +15,8 @@ class WrappingInt32 {
     explicit WrappingInt32(uint32_t raw_value) : _raw_value(raw_value) {}
 
     uint32_t raw_value() const { return _raw_value; }  //!< Access raw stored value
+
+    uint64_t raw_value_64() const { return static_cast<uint64_t>(_raw_value); }  //!< Access raw stored value
 };
 
 //! Transform a 64-bit absolute sequence number (zero-indexed) into a 32-bit relative sequence number
@@ -51,6 +53,8 @@ inline bool operator==(WrappingInt32 a, WrappingInt32 b) { return a.raw_value() 
 
 //! \brief Whether the two integers are not equal.
 inline bool operator!=(WrappingInt32 a, WrappingInt32 b) { return !(a == b); }
+
+inline bool operator>(WrappingInt32 a, WrappingInt32 b) { return a.raw_value() > b.raw_value(); }
 
 //! \brief Serializes the wrapping integer, `a`.
 inline std::ostream &operator<<(std::ostream &os, WrappingInt32 a) { return os << a.raw_value(); }
