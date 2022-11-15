@@ -33,6 +33,21 @@ size_t ByteStream::write(const string &data)
     return written_size;
 }
 
+size_t ByteStream::write(const char data)
+{
+    if (_buf_open == false)
+        return 0;
+
+    size_t written_size = min(static_cast<size_t>(1), remaining_capacity());
+    std::vector<char>::iterator begin = _buf.begin() + _buf.size();
+    _buf.resize(_buf.size() + written_size);
+    std::copy(&data,
+              &data + written_size,
+              begin);
+    _bytes_w += written_size;
+    return written_size;
+}
+
 //! \param[in] len bytes will be copied from the output side of the buffer
 string ByteStream::peek_output(const size_t len) const
 {
