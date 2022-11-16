@@ -14,7 +14,7 @@ using namespace std;
 
 #define ASSERT(cond)                                            \
     do {                                                        \
-        if (!(cond)) {                                            \
+        if (!(cond)) {                                          \
             printf("\033[1;31m");                               \
             printf("Assert: %s(%d): ", __FILE__, __LINE__);     \
             printf("ASSERT(%s) failed!\n", #cond);              \
