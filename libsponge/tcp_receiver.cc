@@ -21,8 +21,7 @@ void TCPReceiver::segment_received(const TCPSegment &seg)
         return;
 
     size_t bw = _reassembler.stream_out().bytes_written();
-    uint64_t cp = bw != 0 ? bw - 1 : 0;
-    uint64_t abs_seqno = unwrap(seg.header().seqno, _isn, cp);
+    uint64_t abs_seqno = unwrap(seg.header().seqno, _isn, bw);
     if (seg.header().syn)
         abs_seqno = 1;
 
