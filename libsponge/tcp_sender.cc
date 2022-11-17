@@ -55,19 +55,14 @@ void TCPSender::fill_window()
         if (seg.length_in_sequence_space() == 0)
             break;
 
-        if (_flight_segs.empty()) {
-            _retransmission_num = _initial_retransmission_timeout;
-            _time = 0;
-        }
-
         // send segment
         _segments_out.push(seg);
+        // backup
+        _flight_segs.push(make_pair(_next_seqno, seg));
         // update next absolute seqno
         _next_seqno += seg.length_in_sequence_space();
         // update flighte bytes
         _flight_bytes += seg.length_in_sequence_space();
-        // backup
-        _flight_segs.push(make_pair(_next_seqno, seg));
 
         if (seg.header().fin)
             break;
@@ -110,16 +105,16 @@ void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
 void TCPSender::tick(const size_t ms_since_last_tick)
 {
     _time += ms_since_last_tick;
-    if (_time >= _rto)
+    if (_time >= _rto && !_flight_segs.empty())
     {
         _segments_out.push(_flight_segs.front().second);
-        if (_window_size != 0)
+        if (_window_size != 0 || _flight_segs.front().second.header().syn)
         {
             _retransmission_num++;
             _rto *= 2;
         }
+        _time = 0;
     }
-    _time = 0;
 }
 
 unsigned int TCPSender::consecutive_retransmissions() const { return _retransmission_num; }
