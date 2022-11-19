@@ -101,4 +101,19 @@ class TCPConnection {
     //!@}
 };
 
+
+#ifndef ASSERT
+#define ASSERT(cond)                                            \
+    do {                                                        \
+        if (!(cond)) {                                          \
+            printf("\033[1;31m");                               \
+            printf("Assert: %s(%d): ", __FILE__, __LINE__);     \
+            printf("ASSERT(%s) failed!\n", #cond);              \
+            printf("Aborted.\n");                               \
+            printf("\033[0m");                                  \
+            exit(1);                                            \
+        }                                                       \
+    } while(0)
+#endif
+
 #endif  // SPONGE_LIBSPONGE_TCP_FACTORED_HH

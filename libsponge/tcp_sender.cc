@@ -46,7 +46,7 @@ void TCPSender::fill_window()
         seg.payload() = Buffer(_stream.read(payload_bytes));
         payload_bytes = seg.payload().size();
 
-        if (!_set_fin && _stream.eof() &&  window_size - payload_bytes - _flight_bytes - seg.header().syn > 0)
+        if (!_set_fin && _stream.eof() &&  window_size - payload_bytes - _flight_bytes > 0)
         {
             seg.header().fin = true;
             _set_fin = true;
@@ -54,6 +54,11 @@ void TCPSender::fill_window()
 
         if (seg.length_in_sequence_space() == 0)
             break;
+
+        if (_flight_segs.empty()) {
+            _rto = _initial_retransmission_timeout;
+            _time = 0;
+        }
 
         // send segment
         _segments_out.push(seg);

@@ -65,13 +65,13 @@ void TCPConnection::segment_received(const TCPSegment &seg)
         {
             _sender.send_empty_segment();
         }
-        _send();
     }
     else if (_receiver.ackno().has_value() &&
              seg.header().seqno == _receiver.ackno().value() - 1)
     {
         _sender.send_empty_segment();
     }
+    _send();
 }
 
 bool TCPConnection::active() const { return _active; }
@@ -89,6 +89,7 @@ size_t TCPConnection::write(const string &data) {
 //! \param[in] ms_since_last_tick number of milliseconds since the last call to this method
 void TCPConnection::tick(const size_t ms_since_last_tick)
 {
+
     if (!_active)
         return;
 
@@ -110,6 +111,7 @@ void TCPConnection::tick(const size_t ms_since_last_tick)
     _ms_since_last_tick += ms_since_last_tick;
 
     _send();
+    ASSERT(_sender.segments_out().empty());
 
     if (_receiver.stream_out().input_ended() &&
         _sender.stream_in().eof() &&
