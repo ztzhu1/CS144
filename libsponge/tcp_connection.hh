@@ -20,6 +20,11 @@ class TCPConnection {
     //! for 10 * _cfg.rt_timeout milliseconds after both streams have ended,
     //! in case the remote TCPConnection doesn't know we've received its whole stream?
     bool _linger_after_streams_finish{true};
+    bool _active = true;
+    size_t _ms_since_last_tick = 0;
+
+    void _send();
+    void _unclean_shutdown();
 
   public:
     //! \name "Input" interface for the writer
@@ -95,5 +100,20 @@ class TCPConnection {
     TCPConnection &operator=(const TCPConnection &other) = delete;
     //!@}
 };
+
+
+#ifndef ASSERT
+#define ASSERT(cond)                                            \
+    do {                                                        \
+        if (!(cond)) {                                          \
+            printf("\033[1;31m");                               \
+            printf("Assert: %s(%d): ", __FILE__, __LINE__);     \
+            printf("ASSERT(%s) failed!\n", #cond);              \
+            printf("Aborted.\n");                               \
+            printf("\033[0m");                                  \
+            exit(1);                                            \
+        }                                                       \
+    } while(0)
+#endif
 
 #endif  // SPONGE_LIBSPONGE_TCP_FACTORED_HH
