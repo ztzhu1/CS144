@@ -4,9 +4,12 @@
 #include "ethernet_frame.hh"
 #include "tcp_over_ip.hh"
 #include "tun.hh"
+#include "arp_message.hh"
 
 #include <optional>
 #include <queue>
+#include <map>
+#include <vector>
 
 //! \brief A "network interface" that connects IP (the internet layer, or network layer)
 //! with Ethernet (the network access layer, or link layer).
@@ -39,6 +42,16 @@ class NetworkInterface {
 
     //! outbound queue of Ethernet frames that the NetworkInterface wants sent
     std::queue<EthernetFrame> _frames_out{};
+
+    uint32_t _eth_req_interval = 5000; // ms
+    uint32_t _mapping_ttl = 30000; // ms
+    std::map<uint32_t, std::pair<EthernetAddress, uint32_t>> _ip_eth_map{};
+    std::map<uint32_t, uint32_t> _wait_for_eth{};
+    std::vector<std::pair<Address, InternetDatagram>> _wait_for_sending{};
+
+    void _send_arp_req(uint32_t next_hop_ip);
+    void _send_arp_reply_and_update_map(ARPMessage &req_msg);
+    void _update_map(uint32_t ip, EthernetAddress eth);
 
   public:
     //! \brief Construct a network interface with given Ethernet (network-access-layer) and IP (internet-layer) addresses
